@@ -28,24 +28,29 @@ class SayThis(BoxLayout):
         self.saywhat_text.text = ""
         self.saywhat_text.focus = True
 
-    def say_something_espeak(self, text):
+    def sayit_espeak(self, text):
+        print("Attempting to speak using espeak:\n"+text)
         if whereis_exe("espeak"):
-            subprocess.call(["espeak", text])
+            subprocess.call(["espeak", self.saywhat_text.text])
 
-    def say_something_google(self, text):
-        tts = gTTS(text=text, lang='en')
+    def sayit_google(self, text):
+        print("Attempting to speak using Google TTS:\n"+text)
+        tts = gTTS(text=self.saywhat_text.text, lang='en')
         tts.save("out.mp3")
         sound = SoundLoader.load("out.mp3")
         if sound:
             sound.play()
 
-    def say_something_osx(self, text):
+    def sayit_osx(self, text, kwargs):
+        print("Attempting to speak using OSX TTS:\n"+text)
         if whereis_exe("say"):
-            subprocess.call(["say", text])
+            subprocess.call(["say", text, "-v", kwargs['voice'], "-r", kwargs['rate']])
 
-    def say_something_watson(self, text):
-        r = requests.get('https://stream.watsonplatform.net/text-to-speech/api/v1/synthesize?text=Hello+World',
-            auth=(WATSON_USERNAME, WATSON_PASSWORD))
+    def sayit_watson(self, text):
+        print("Attempting to speak using Watson TTS:\n"+text)
+        watson_api_url = 'https://stream.watsonplatform.net/text-to-speech/api/v1/synthesize?text='
+        r = requests.get(watson_api_url+text,
+                         auth=(WATSON_USERNAME, WATSON_PASSWORD))
         if r.status_code == 200:
             file = open("out.wav", "wb")
             file.write(r.content)
@@ -53,7 +58,6 @@ class SayThis(BoxLayout):
             sound = SoundLoader.load("out.wav")
             if sound:
                 sound.play()
-
 
 
 class SayThisApp(App):

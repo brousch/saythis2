@@ -1,6 +1,7 @@
 #:kivy 1.9.1
 
 #: import window kivy.core.window.Window
+#: import osx_say tts_engines.osx_say
 
 <SayThis>:
     orientation: 'vertical'
@@ -27,37 +28,110 @@
             text: 'Hello, world!'
             font_size: str(font_slider.value)+'sp'
     BoxLayout:
+        id: sayit_clear_button_box
         orientation: 'horizontal'
         size_hint: 1, None
-        height: clear_button.height
+        height: btn_sayit.texture_size[1] + (2 * root.padding[1])
         Button:
+            id: btn_sayit
+            text: "Say It!"
+            font_size: root.button_font_size
+            size_hint: 1, None
+            height: self.texture_size[1] + (2 * root.padding[1])
+            on_press: tp_tts_engines.current_tab.sayit_action(saywhat_text.text, tp_tts_engines.current_tab.sayit_args)
+        Button:
+            id: btn_clear
+            text: 'Clear'
+            font_size: root.button_font_size
+            size_hint: 1, None
+            height: self.texture_size[1] + (2 * root.padding[1])
+            on_press: root.clear()
+    TabbedPanel:
+        id: tp_tts_engines
+        do_default_tab: False
+        tab_pos: 'top_mid'
+        tab_width: sayit_clear_button_box.width / 4.5
+        TabbedPanelItem:
+            id: tpi_osx_tts
             text: 'OSX TTS'
             font_size: root.button_font_size
-            size_hint: 1, None
-            height: self.texture_size[1] + (2 * root.padding[1])
-            on_press: root.say_something_osx(saywhat_text.text)
-        Button:
+            size_hint: .25, 1
+            sayit_action: root.sayit_osx
+            sayit_args: {'voice': osx_voices.text, 'rate': str(osx_rate.value)}
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: ''
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint: 1, None
+                    height: btn_sayit.texture_size[1] + (2 * root.padding[1])
+                    Label:
+                        id: lbl_for_osx_voices
+                        text: 'Voice: '
+                        font_size: root.button_font_size
+                        size_hint: None, None
+                        height: self.texture_size[1] + (2 * root.padding[1])
+                        width: self.texture_size[0] + (2 * root.padding[0])
+                    Spinner:
+                        id: osx_voices
+                        font_size: root.button_font_size
+                        size_hint: 1, None
+                        height: lbl_for_osx_voices.height
+                        values: [ voice.name for voice in osx_say.fetch_voices() ]
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint: 1, None
+                    height: btn_sayit.texture_size[1] + (2 * root.padding[1])
+                    Label:
+                        id: lbl_for_osx_rate
+                        text: 'Rate (WPM): '
+                        font_size: root.button_font_size
+                        size_hint: None, None
+                        height: self.texture_size[1] + (2 * root.padding[1])
+                        width: self.texture_size[0] + (2 * root.padding[0])
+                    Slider:
+                        id: osx_rate
+                        min: 30
+                        max: 1000
+                        value: 275
+                        size_hint: 1, None
+                        height: lbl_for_osx_rate.height
+                Label:
+                    text: ''
+        TabbedPanelItem:
+            id: tpi_espeak
             text: 'Espeak'
             font_size: root.button_font_size
-            size_hint: 1, None
-            height: self.texture_size[1] + (2 * root.padding[1])
-            on_press: root.say_something_espeak(saywhat_text.text)
-        Button:
-            text: 'Google'
+            size_hint: .25, 1
+            sayit_action: root.sayit_espeak
+            BoxLayout:
+                Button:
+                    text: "Espeak"
+                    font_size: root.button_font_size
+                    size_hint: 1, None
+                    height: self.texture_size[1] + (2 * root.padding[1])
+        TabbedPanelItem:
+            id: tpi_google
+            text: 'Google TTS'
             font_size: root.button_font_size
-            size_hint: 1, None
-            height: self.texture_size[1] + (2 * root.padding[1])
-            on_press: root.say_something_google(saywhat_text.text)
-        Button:
-            text: 'Watson'
+            size_hint: .25, 1
+            sayit_action: root.sayit_google
+            BoxLayout:
+                Button:
+                    text: "Google TTS"
+                    font_size: root.button_font_size
+                    size_hint: 1, None
+                    height: self.texture_size[1] + (2 * root.padding[1])
+        TabbedPanelItem:
+            id: tpi_watson
+            text: 'Watson TTS'
             font_size: root.button_font_size
-            size_hint: 1, None
-            height: self.texture_size[1] + (2 * root.padding[1])
-            on_press: root.say_something_watson(saywhat_text.text)
-    Button:
-        id: clear_button
-        text: 'Clear'
-        font_size: root.button_font_size
-        size_hint: 1, None
-        height: self.texture_size[1] + (2 * root.padding[1])
-        on_press: root.clear()
+            size_hint: .25, 1
+            sayit_action: root.sayit_watson
+            BoxLayout:
+                Button:
+                    text: "Watson TTS"
+                    font_size: root.button_font_size
+                    size_hint: 1, None
+                    height: self.texture_size[1] + (2 * root.padding[1])
