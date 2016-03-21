@@ -14,8 +14,8 @@ from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 
 from utils import whereis_exe
-from secret import WATSON_USERNAME
-from secret import WATSON_PASSWORD
+from tts_engines import osx_say
+from tts_engines import watson
 
 
 __version__ = '0.0.1'
@@ -43,21 +43,11 @@ class SayThis(BoxLayout):
 
     def sayit_osx(self, text, kwargs):
         print("Attempting to speak using OSX TTS:\n"+text)
-        if whereis_exe("say"):
-            subprocess.call(["say", text, "-v", kwargs['voice'], "-r", kwargs['rate']])
+        osx_say.speak(text, kwargs['voice'], kwargs['rate'])
 
-    def sayit_watson(self, text):
+    def sayit_watson(self, text, kwargs):
         print("Attempting to speak using Watson TTS:\n"+text)
-        watson_api_url = 'https://stream.watsonplatform.net/text-to-speech/api/v1/synthesize?text='
-        r = requests.get(watson_api_url+text,
-                         auth=(WATSON_USERNAME, WATSON_PASSWORD))
-        if r.status_code == 200:
-            file = open("out.wav", "wb")
-            file.write(r.content)
-            file.close()
-            sound = SoundLoader.load("out.wav")
-            if sound:
-                sound.play()
+        watson.speak(text, kwargs['voice'])
 
 
 class SayThisApp(App):

@@ -2,6 +2,7 @@
 
 #: import window kivy.core.window.Window
 #: import osx_say tts_engines.osx_say
+#: import watson tts_engines.watson
 
 <SayThis>:
     orientation: 'vertical'
@@ -129,9 +130,27 @@
             font_size: root.button_font_size
             size_hint: .25, 1
             sayit_action: root.sayit_watson
+            sayit_args: {'voice': watson_voices.text}
             BoxLayout:
-                Button:
-                    text: "Watson TTS"
-                    font_size: root.button_font_size
+                orientation: 'vertical'
+                Label:
+                    text: ''
+                BoxLayout:
+                    orientation: 'horizontal'
                     size_hint: 1, None
-                    height: self.texture_size[1] + (2 * root.padding[1])
+                    height: btn_sayit.texture_size[1] + (2 * root.padding[1])
+                    Label:
+                        id: lbl_for_watson_voices
+                        text: 'Voice: '
+                        font_size: root.button_font_size
+                        size_hint: None, None
+                        height: self.texture_size[1] + (2 * root.padding[1])
+                        width: self.texture_size[0] + (2 * root.padding[0])
+                    Spinner:
+                        id: watson_voices
+                        font_size: root.button_font_size
+                        size_hint: 1, None
+                        height: lbl_for_osx_voices.height
+                        values: [ voice.name for voice in watson.fetch_voices() ]
+                Label:
+                    text: ''

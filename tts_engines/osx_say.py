@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 
 from utils import whereis_exe
 
@@ -27,3 +28,8 @@ def fetch_voices():
             except IndexError:
                 pass
     return osx_voices
+
+
+def speak(text, voice, rate):
+    if whereis_exe("say"):
+        subprocess.call(["say", text, "-v", voice, "-r", rate])
